@@ -90,3 +90,48 @@ export async function GET(
 
     const data = await response.json()
     console.log(`Successfully fetched ${type} tokens:`, data?.length || 'unknown count')
+    
+
+    if (data && data.length > 0) {
+      console.log(`Sample ${type} token structure:`)
+      console.log('Keys:', Object.keys(data[0]))
+      console.log('Sample data:', JSON.stringify(data[0], null, 2))
+    }
+
+    return NextResponse.json({ tokens: data }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+    })
+  } catch (error) {
+    console.error(`API Route Error for ${type}:`, error)
+    
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      return NextResponse.json(
+        { error: 'Network error. Please check your internet connection.' },
+        { status: 503 }
+      )
+    }
+    
+    return NextResponse.json(
+      { 
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      },
+      { status: 500 }
+    )
+  }
+}
+
+export async function OPTIONS(request: NextRequest) {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  })
+}

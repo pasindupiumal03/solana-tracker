@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from 'next/server'
 
 const BASE_URL = "https://data.solanatracker.io"
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
     const isTokenAddress = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(query.trim())
     
     if (isTokenAddress) {
-        try {
+      try {
         const response = await fetch(`${BASE_URL}/tokens/${query.trim()}`, {
           method: 'GET',
           headers: {
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
           const poolLiquidity = primaryPool.liquidity || {}
           const poolMarketCap = primaryPool.marketCap || {}
           const poolTxns = primaryPool.txns || {}
-
+          
           const detailedToken = {
             mint: token.mint || query.trim(),
             name: token.name || 'Unknown Token',
@@ -84,6 +85,7 @@ export async function GET(request: NextRequest) {
             tokenSupply: primaryPool.tokenSupply || 0,
             isDetailedView: true
           }
+
           return NextResponse.json([detailedToken], {
             headers: {
               'Cache-Control': 's-maxage=300, stale-while-revalidate=600',
@@ -92,7 +94,7 @@ export async function GET(request: NextRequest) {
               'Access-Control-Allow-Headers': 'Content-Type',
             },
           })
-          } else if (response.status === 404) {
+        } else if (response.status === 404) {
           return NextResponse.json(
             { error: 'Token not found or not supported' },
             { status: 404 }
@@ -117,6 +119,7 @@ export async function GET(request: NextRequest) {
         'x-api-key': API_KEY,
       },
     })
+
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`
       
@@ -144,6 +147,7 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json()
+    
     const searchTerm = query.toLowerCase().trim()
     const filteredTokens = data.filter((token: any) => {
       return (
@@ -152,6 +156,8 @@ export async function GET(request: NextRequest) {
         token.mint?.toLowerCase().includes(searchTerm)
       )
     })
+
+
     const limitedResults = filteredTokens.slice(0, 20)
 
     return NextResponse.json(limitedResults, {
@@ -181,6 +187,7 @@ export async function GET(request: NextRequest) {
     )
   }
 }
+
 
 export async function OPTIONS() {
   return new NextResponse(null, {

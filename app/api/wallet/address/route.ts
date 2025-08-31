@@ -38,7 +38,6 @@ export async function GET(
       } catch (e) {
       }
       
-    
       if (response.status === 401) {
         return NextResponse.json(
           { error: 'API authentication required. The SolanaTracker API may require an API key or have authentication restrictions.' },
