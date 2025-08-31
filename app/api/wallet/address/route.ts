@@ -29,17 +29,16 @@ export async function GET(
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`
       
-      // Try to get more detailed error from response body
+
       try {
         const errorData = await response.text()
         if (errorData) {
           errorMessage += ` - ${errorData}`
         }
       } catch (e) {
-        // Ignore if we can't parse error response
       }
       
-      // Handle specific error codes
+    
       if (response.status === 401) {
         return NextResponse.json(
           { error: 'API authentication required. The SolanaTracker API may require an API key or have authentication restrictions.' },
